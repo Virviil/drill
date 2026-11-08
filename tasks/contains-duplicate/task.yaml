@@ -1,0 +1,8 @@
+title: Есть ли дубликат
+difficulty: easy
+pattern: Arrays & Hashing
+month: 1
+order: 1
+link: https://leetcode.com/problems/contains-duplicate/
+compare: exact
+time_limit_ms: 1000

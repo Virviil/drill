@@ -1,0 +1,8 @@
+title: K самых частых
+difficulty: medium
+pattern: Arrays & Hashing
+month: 1
+order: 4
+link: https://leetcode.com/problems/top-k-frequent-elements/
+compare: unordered
+time_limit_ms: 1000

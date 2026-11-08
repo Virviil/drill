@@ -1,0 +1,8 @@
+title: Сумма двух
+difficulty: easy
+pattern: Arrays & Hashing
+month: 1
+order: 3
+link: https://leetcode.com/problems/two-sum/
+compare: unordered
+time_limit_ms: 1000

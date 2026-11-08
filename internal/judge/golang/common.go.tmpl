@@ -1,0 +1,51 @@
+package main
+
+// Injected by the judge into every Go solution. Do not edit per task:
+// a task's harness.go only defines __call.
+
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+	"time"
+)
+
+// Results go to the real stdout; anything the solution prints goes to stderr.
+var __out = os.Stdout
+
+func init() { os.Stdout = os.Stderr }
+
+type __res struct {
+	Got any    `json:"got"`
+	Err string `json:"err,omitempty"`
+}
+
+func __arg(raw json.RawMessage, v any) {
+	if err := json.Unmarshal(raw, v); err != nil {
+		panic(fmt.Sprintf("bad test input: %v", err))
+	}
+}
+
+func main() {
+	var cases [][]json.RawMessage
+	if err := json.NewDecoder(os.Stdin).Decode(&cases); err != nil {
+		fmt.Fprintln(os.Stderr, "judge: bad input:", err)
+		os.Exit(2)
+	}
+	enc := json.NewEncoder(__out)
+	var total time.Duration
+	for _, a := range cases {
+		func() {
+			defer func() {
+				if r := recover(); r != nil {
+					enc.Encode(__res{Err: fmt.Sprint("panic: ", r)})
+				}
+			}()
+			start := time.Now()
+			got := __call(a)
+			total += time.Since(start)
+			enc.Encode(__res{Got: got})
+		}()
+	}
+	fmt.Fprintf(__out, "{\"time_ms\":%d}\n", total.Milliseconds())
+}

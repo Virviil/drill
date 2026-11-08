@@ -1,0 +1,20 @@
+package main
+
+func longestConsecutive(nums []int) int {
+	set := make(map[int]bool, len(nums))
+	for _, v := range nums {
+		set[v] = true
+	}
+	best := 0
+	for v := range set {
+		if set[v-1] {
+			continue
+		}
+		n := 1
+		for set[v+n] {
+			n++
+		}
+		best = max(best, n)
+	}
+	return best
+}

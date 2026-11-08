@@ -1,0 +1,10 @@
+package main
+
+func maxProfit(prices []int) int {
+	best, lo := 0, prices[0]
+	for _, p := range prices {
+		lo = min(lo, p)
+		best = max(best, p-lo)
+	}
+	return best
+}

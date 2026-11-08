@@ -1,0 +1,8 @@
+title: Подстрока без повторов
+difficulty: medium
+pattern: Sliding Window
+month: 1
+order: 10
+link: https://leetcode.com/problems/longest-substring-without-repeating-characters/
+compare: exact
+time_limit_ms: 1000

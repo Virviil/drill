@@ -1,0 +1,41 @@
+# Postgres + drill. The judge starts sibling containers through the host's
+# Docker socket, so job files live in a directory with the same path on the
+# host and inside the drill container (/var/lib/drill/jobs).
+#
+#   make sandbox-image   # once: builds drill-go:1 on the host
+#   docker compose up -d
+#   ssh -p 2222 localhost
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: drill
+      POSTGRES_PASSWORD: drill
+      POSTGRES_DB: drill
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U drill"]
+      interval: 2s
+      retries: 20
+    restart: unless-stopped
+
+  drill:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DRILL_DB: postgres://drill:drill@db:5432/drill?sslmode=disable
+      DRILL_JOBS_DIR: /var/lib/drill/jobs
+    ports:
+      - "2222:2222"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/drill/jobs:/var/lib/drill/jobs
+      - drilldata:/data
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  drilldata:

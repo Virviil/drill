@@ -1,0 +1,8 @@
+title: Палиндром
+difficulty: easy
+pattern: Two Pointers
+month: 1
+order: 7
+link: https://leetcode.com/problems/valid-palindrome/
+compare: exact
+time_limit_ms: 1000

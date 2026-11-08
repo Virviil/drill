@@ -1,0 +1,80 @@
+# Six-month plan, Nov 2026 – Apr 2027. Source: "План на полгода: Python, Go, Rust без костылей".
+# Each item can be ticked off on the "План" screen. IDs must stay stable: progress refers to them.
+start: 2026-11
+months:
+  - n: 1
+    title: Ноябрь · Go
+    lang: go
+    topics: Arrays & Hashing, Two Pointers, Sliding Window (~20 задач)
+    milestone: KV-сервер на Go работает с redis-cli; 20 задач, из них 70% сам
+    items:
+      - {id: m1-baseline, kind: checkpoint, title: "Входной срез: 3 Easy + 2 Medium за 90 минут, CLI частот слов на 3 языках"}
+      - {id: m1-lgwt, kind: theory, title: "Learn Go with Tests: закрыть дыры"}
+      - {id: m1-ifaces, kind: theory, title: "Интерфейсы и ошибки"}
+      - {id: m1-conc, kind: theory, title: "Goroutines, channels, context"}
+      - {id: m1-kv-resp, kind: project, title: "KV-сервер: протокол RESP"}
+      - {id: m1-kv-cmds, kind: project, title: "KV-сервер: GET/SET/DEL/EXPIRE, goroutine на соединение"}
+      - {id: m1-kv-cli, kind: project, title: "KV-сервер работает с redis-cli"}
+      - {id: m1-read-bufio, kind: reading, title: "Чтение: bufio"}
+      - {id: m1-read-sync, kind: reading, title: "Чтение: sync/mutex.go"}
+      - {id: m1-read-http, kind: reading, title: "Чтение: net/http/server.go"}
+  - n: 2
+    title: Декабрь · Python
+    lang: python
+    topics: Stack, Binary Search, Linked List (~20 задач)
+    milestone: ""
+    items:
+      - {id: m2-fp-1-3, kind: theory, title: "Fluent Python, гл. 1–3"}
+      - {id: m2-fp-7-9, kind: theory, title: "Fluent Python, гл. 7–9"}
+      - {id: m2-fp-17-19, kind: theory, title: "Fluent Python, гл. 17–19"}
+      - {id: m2-typing, kind: theory, title: "typing, dataclasses, итераторы, asyncio"}
+      - {id: m2-kv-async, kind: project, title: "Порт KV-сервера на asyncio + pytest"}
+      - {id: m2-note, kind: project, title: "Заметка «goroutines vs asyncio» на полстраницы"}
+      - {id: m2-read-coll, kind: reading, title: "Чтение: collections, functools"}
+      - {id: m2-read-streams, kind: reading, title: "Чтение: asyncio/streams.py"}
+      - {id: m2-read-httpx, kind: reading, title: "Чтение: httpx, путь Client.get"}
+  - n: 3
+    title: Январь · Go глубже
+    lang: go
+    topics: Trees, Tries, Heap (~20 задач)
+    milestone: Python-версия KV + тесты MapReduce с -race; повтор входного среза на 30% быстрее
+    items:
+      - {id: m3-patterns, kind: theory, title: "Паттерны конкурентности"}
+      - {id: m3-generics, kind: theory, title: "Generics"}
+      - {id: m3-pprof, kind: theory, title: "pprof и race detector"}
+      - {id: m3-mapreduce, kind: project, title: "MIT 6.5840 Lab 1 (MapReduce), тесты с -race"}
+      - {id: m3-read-raft, kind: reading, title: "Чтение: etcd-io/raft или bbolt"}
+      - {id: m3-checkpoint, kind: checkpoint, title: "Повтор входного среза"}
+  - n: 4
+    title: Февраль · Rust I
+    lang: rust
+    topics: Backtracking, Graphs (~18 задач)
+    milestone: ""
+    items:
+      - {id: m4-book-1-9, kind: theory, title: "The Rust Book, гл. 1–9 + rustlings"}
+      - {id: m4-book-10a, kind: theory, title: "Гл. 10 (generics, traits, lifetimes), первый проход"}
+      - {id: m4-book-10b, kind: theory, title: "Гл. 10, второй проход"}
+      - {id: m4-grep, kind: project, title: "Клон grep с флагами, тестами и своим типом ошибки"}
+      - {id: m4-read-rg, kind: reading, title: "Чтение: ripgrep grep-cli, ignore"}
+  - n: 5
+    title: Март · Rust II
+    lang: rust
+    topics: 1-D DP, Greedy, Intervals (~20 задач)
+    milestone: grep-клон готов, Lox парсит выражения; ~100 задач NeetCode
+    items:
+      - {id: m5-book-13-19, kind: theory, title: "The Rust Book, гл. 13–19"}
+      - {id: m5-lox-scan, kind: project, title: "Lox: сканер"}
+      - {id: m5-lox-parse, kind: project, title: "Lox: парсер и выражения"}
+      - {id: m5-read-std, kind: reading, title: "Чтение: Rust library/ Vec, Option, Iterator"}
+  - n: 6
+    title: Апрель · Rust III + собесы
+    lang: go
+    topics: 2-D DP, повтор слабых тем, Weekly Contest, 4 мока на Go
+    milestone: 4 мока (3 успешны), 3 из 4 на Weekly Contest, принятый PR в чужой проект
+    items:
+      - {id: m6-lifetimes, kind: theory, title: "Lifetimes в структурах, базовый tokio"}
+      - {id: m6-rfr, kind: theory, title: "Rust for Rustaceans, гл. 1–3"}
+      - {id: m6-lox-funcs, kind: project, title: "Lox: переменные, управление потоком, функции, замыкания"}
+      - {id: m6-read-miniredis, kind: reading, title: "Чтение: tokio-rs/mini-redis целиком"}
+      - {id: m6-mocks, kind: checkpoint, title: "4 мок-собеса"}
+      - {id: m6-pr, kind: checkpoint, title: "Принятый PR в чужой проект"}

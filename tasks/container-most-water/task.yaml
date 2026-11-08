@@ -1,0 +1,8 @@
+title: Контейнер с водой
+difficulty: medium
+pattern: Two Pointers
+month: 1
+order: 8
+link: https://leetcode.com/problems/container-with-most-water/
+compare: exact
+time_limit_ms: 1000

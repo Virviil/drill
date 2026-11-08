@@ -1,0 +1,14 @@
+package main
+
+func lengthOfLongestSubstring(s string) int {
+	var last [256]int
+	best, start := 0, 0
+	for i := 0; i < len(s); i++ {
+		if last[s[i]] > start {
+			start = last[s[i]]
+		}
+		last[s[i]] = i + 1
+		best = max(best, i-start+1)
+	}
+	return best
+}

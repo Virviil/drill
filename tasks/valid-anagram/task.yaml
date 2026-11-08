@@ -1,0 +1,8 @@
+title: Анаграмма
+difficulty: easy
+pattern: Arrays & Hashing
+month: 1
+order: 2
+link: https://leetcode.com/problems/valid-anagram/
+compare: exact
+time_limit_ms: 1000

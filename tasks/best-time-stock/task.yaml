@@ -1,0 +1,8 @@
+title: Лучший момент для сделки
+difficulty: easy
+pattern: Sliding Window
+month: 1
+order: 9
+link: https://leetcode.com/problems/best-time-to-buy-and-sell-stock/
+compare: exact
+time_limit_ms: 1000

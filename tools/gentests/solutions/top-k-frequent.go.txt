@@ -1,0 +1,17 @@
+package main
+
+func topKFrequent(nums []int, k int) []int {
+	freq := map[int]int{}
+	for _, v := range nums {
+		freq[v]++
+	}
+	buckets := make([][]int, len(nums)+1)
+	for v, f := range freq {
+		buckets[f] = append(buckets[f], v)
+	}
+	var out []int
+	for f := len(buckets) - 1; f > 0 && len(out) < k; f-- {
+		out = append(out, buckets[f]...)
+	}
+	return out[:k]
+}

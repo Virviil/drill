@@ -1,0 +1,8 @@
+title: Произведение кроме себя
+difficulty: medium
+pattern: Arrays & Hashing
+month: 1
+order: 5
+link: https://leetcode.com/problems/product-of-array-except-self/
+compare: exact
+time_limit_ms: 1000

@@ -1,0 +1,13 @@
+package main
+
+func isAnagram(s string, t string) bool {
+	if len(s) != len(t) {
+		return false
+	}
+	var c [26]int
+	for i := 0; i < len(s); i++ {
+		c[s[i]-'a']++
+		c[t[i]-'a']--
+	}
+	return c == [26]int{}
+}
