@@ -22,9 +22,10 @@ import (
 	gossh "golang.org/x/crypto/ssh"
 
 	"github.com/Virviil/drill/internal/catalog"
+	"github.com/Virviil/drill/internal/core"
+	"github.com/Virviil/drill/internal/doors/drill"
+	"github.com/Virviil/drill/internal/hub"
 	"github.com/Virviil/drill/internal/judge"
-	"github.com/Virviil/drill/internal/store"
-	"github.com/Virviil/drill/internal/ui"
 )
 
 func env(key, def string) string {
@@ -56,7 +57,7 @@ func main() {
 	}
 	log.Info("content loaded", "tasks", len(cat.Tasks), "months", len(cat.Plan.Months))
 
-	st, err := store.Open(ctx, *dbURL)
+	st, err := core.Open(ctx, *dbURL)
 	if err != nil {
 		log.Error("open db", "err", err)
 		os.Exit(1)
@@ -76,23 +77,47 @@ func main() {
 	}
 	judge.JobsDir = *jobsDir
 	queue := judge.NewQueue(ctx, sb, *workers)
-	deps := ui.Deps{Store: st, Catalog: cat, Queue: queue, Log: log}
+
+	// Doors, in menu order. Each one migrates its own schema.
+	doors := []hub.Door{
+		drill.NewDoor(drill.Deps{Store: drill.NewStore(st.DB()), Catalog: cat, Queue: queue}),
+	}
+	for _, d := range doors {
+		if m := d.Migrations(); m != nil {
+			if err := core.Migrate(ctx, st.DB(), d.ID(), m); err != nil {
+				log.Error("migrate door", "door", d.ID(), "err", err)
+				os.Exit(1)
+			}
+		}
+	}
+	h := &hub.Hub{Core: st, Doors: doors, Presence: hub.NewPresence()}
 
 	handler := func(s ssh.Session) (tea.Model, []tea.ProgramOption) {
 		key := s.PublicKey()
-		sess := ui.Session{
-			Fingerprint: gossh.FingerprintSHA256(key),
-			PublicKey:   strings.TrimSpace(string(gossh.MarshalAuthorizedKey(key))),
-			Remote:      s.RemoteAddr().String(),
-		}
-		user, err := st.UserByFingerprint(s.Context(), sess.Fingerprint)
-		if err != nil && !errors.Is(err, store.ErrNotFound) {
+		fp := gossh.FingerprintSHA256(key)
+		user, err := st.UserByFingerprint(s.Context(), fp)
+		if err != nil && !errors.Is(err, core.ErrNotFound) {
 			log.Error("lookup user", "err", err)
 			wish.Fatalln(s, "внутренняя ошибка, попробуй позже")
 			return nil, nil
 		}
-		model := ui.New(s.Context(), deps, sess, user, bm.MakeRenderer(s))
-		return model, []tea.ProgramOption{tea.WithAltScreen()}
+		pty, _, _ := s.Pty()
+		sess := &hub.Session{
+			User:        user,
+			Fingerprint: fp,
+			PublicKey:   strings.TrimSpace(string(gossh.MarshalAuthorizedKey(key))),
+			Renderer:    bm.MakeRenderer(s),
+			Width:       max(pty.Window.Width, 20),
+			Height:      max(pty.Window.Height, 10),
+			Log:         log.With("remote", s.RemoteAddr().String()),
+			Now:         time.Now,
+		}
+		shell := h.NewShell(s.Context(), sess)
+		go func() {
+			<-s.Context().Done()
+			shell.Close()
+		}()
+		return shell, []tea.ProgramOption{tea.WithAltScreen()}
 	}
 
 	srv, err := wish.NewServer(

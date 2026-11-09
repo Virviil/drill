@@ -1,4 +1,4 @@
-package ui
+package drill
 
 import (
 	"fmt"
@@ -8,11 +8,10 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 
 	"github.com/Virviil/drill/internal/judge"
-	"github.com/Virviil/drill/internal/store"
 )
 
 type statsModel struct {
-	recent []store.Submission
+	recent []Submission
 }
 
 func (a *App) openStats() tea.Cmd {
@@ -54,7 +53,7 @@ func (a *App) viewStats() string {
 		if totalDiff[d] == 0 {
 			continue
 		}
-		fmt.Fprintf(&b, "  %s  %s %d/%d\n", a.st.diff(d), bar(byDiff[d], totalDiff[d], 20), byDiff[d], totalDiff[d])
+		fmt.Fprintf(&b, "  %s  %s %d/%d\n", a.st.Diff(d), bar(byDiff[d], totalDiff[d], 20), byDiff[d], totalDiff[d])
 	}
 	var langs []string
 	for l := range byLang {

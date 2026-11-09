@@ -1,72 +1,39 @@
-package store
+package drill
 
 import (
 	"context"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/Virviil/drill/internal/core"
 )
 
-func open(t *testing.T) *Store {
+func openTest(t *testing.T) (*Store, *core.Store) {
 	url := os.Getenv("DRILL_TEST_DB")
 	if url == "" {
 		t.Skip("set DRILL_TEST_DB to a throwaway Postgres database")
 	}
 	ctx := context.Background()
-	s, err := Open(ctx, url)
+	cs, err := core.Open(ctx, url)
 	if err != nil {
 		t.Fatal(err)
 	}
+	if err := core.Migrate(ctx, cs.DB(), "drill", Migrations()); err != nil {
+		t.Fatal(err)
+	}
+	cs.DB().Exec(ctx, `DELETE FROM core.users WHERE nick LIKE 't-drill-%'`)
 	t.Cleanup(func() {
-		s.db.Exec(ctx, `TRUNCATE users CASCADE`)
-		s.Close()
+		cs.DB().Exec(ctx, `DELETE FROM core.users WHERE nick LIKE 't-drill-%'`)
+		cs.Close()
 	})
-	s.db.Exec(ctx, `TRUNCATE users CASCADE`)
-	return s
-}
-
-func TestUsersAndKeys(t *testing.T) {
-	s := open(t)
-	ctx := context.Background()
-	u, err := s.CreateUser(ctx, "dmitry", "SHA256:a", "ssh-ed25519 AAA")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if _, err := s.CreateUser(ctx, "dmitry", "SHA256:b", "x"); err != ErrNickTaken {
-		t.Fatalf("want ErrNickTaken, got %v", err)
-	}
-	got, err := s.UserByFingerprint(ctx, "SHA256:a")
-	if err != nil || got.ID != u.ID {
-		t.Fatalf("lookup: %v %+v", err, got)
-	}
-	if _, err := s.UserByFingerprint(ctx, "SHA256:zzz"); err != ErrNotFound {
-		t.Fatalf("want ErrNotFound, got %v", err)
-	}
-	code, err := s.NewLinkCode(ctx, u.ID)
-	if err != nil {
-		t.Fatal(err)
-	}
-	linked, err := s.LinkKey(ctx, code, "SHA256:laptop", "ssh-ed25519 BBB")
-	if err != nil || linked.ID != u.ID {
-		t.Fatalf("link: %v", err)
-	}
-	if _, err := s.LinkKey(ctx, code, "SHA256:other", "x"); err == nil {
-		t.Fatal("code must be single-use")
-	}
-	keys, _ := s.Keys(ctx, u.ID)
-	if len(keys) != 2 {
-		t.Fatalf("keys: %v", keys)
-	}
-	// migrations are idempotent
-	if err := s.migrate(ctx); err != nil {
-		t.Fatal(err)
-	}
+	return NewStore(cs.DB()), cs
 }
 
 func TestProgress(t *testing.T) {
-	s := open(t)
+	s, cs := openTest(t)
 	ctx := context.Background()
-	u, _ := s.CreateUser(ctx, "p", "SHA256:p", "k")
+	u, _ := cs.CreateUser(ctx, "t-drill-p", "SHA256:drill-p", "k")
 
 	if err := s.SaveDraft(ctx, u.ID, "two-sum", "go", "v1"); err != nil {
 		t.Fatal(err)

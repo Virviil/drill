@@ -1,4 +1,4 @@
-package ui
+package drill
 
 import (
 	"fmt"
@@ -71,9 +71,9 @@ func (a *App) viewTasks() string {
 			mark = a.st.Warn.Render("• ")
 		}
 		title := fmt.Sprintf("%-34s", clip(t.Title, 34))
-		line := fmt.Sprintf(" %s%s %s  %s", mark, title, a.st.diff(t.Difficulty), a.st.Dim.Render(t.Pattern))
+		line := fmt.Sprintf(" %s%s %s  %s", mark, title, a.st.Diff(t.Difficulty), a.st.Dim.Render(t.Pattern))
 		if i == m.cur {
-			line = a.st.Selected.Render("▸") + mark + a.st.Selected.Render(title) + " " + a.st.diff(t.Difficulty) + "  " + a.st.Dim.Render(t.Pattern)
+			line = a.st.Selected.Render("▸") + mark + a.st.Selected.Render(title) + " " + a.st.Diff(t.Difficulty) + "  " + a.st.Dim.Render(t.Pattern)
 		}
 		b.WriteString(line + "\n")
 		shown++

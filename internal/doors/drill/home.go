@@ -1,4 +1,4 @@
-package ui
+package drill
 
 import (
 	"fmt"
@@ -8,6 +8,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 
 	"github.com/Virviil/drill/internal/catalog"
+	"github.com/Virviil/drill/internal/hub"
 )
 
 type homeModel struct {
@@ -23,8 +24,7 @@ var homeMenu = []menuItem{
 	{"d", "Задача дня", "следующая нерешённая из плана"},
 	{"p", "План", "полугодовой план, отмечай сделанное"},
 	{"s", "Статистика", "стрик, решённые, последние посылки"},
-	{"k", "Ключи", "привязать ещё один SSH-ключ"},
-	{"q", "Выход", ""},
+	{"q", "В хаб", "назад в главное меню"},
 }
 
 func (a *App) updateHome(msg tea.Msg) tea.Cmd {
@@ -55,10 +55,8 @@ func (a *App) updateHome(msg tea.Msg) tea.Cmd {
 		a.openPlan()
 	case "s":
 		return a.openStats()
-	case "k":
-		a.openKeys()
 	case "q":
-		return tea.Quit
+		return hub.Back
 	}
 	return nil
 }
@@ -87,11 +85,7 @@ func (a *App) taskOfDay() *catalog.Task {
 
 func (a *App) viewHome() string {
 	var left strings.Builder
-	if a.h >= 34 {
-		left.WriteString(a.st.Title.Render(banner) + "\n\n")
-	} else {
-		left.WriteString("\n")
-	}
+	left.WriteString(a.st.Title.Render("Тренажёр") + "\n" + a.st.Dim.Render("решай без ИИ, отмечай план") + "\n\n")
 	for i, it := range homeMenu {
 		line := fmt.Sprintf(" %s  %-12s", a.st.Key.Render("["+it.key+"]"), it.title)
 		if i == a.home.cur {
@@ -137,7 +131,7 @@ func (a *App) viewHome() string {
 	right.WriteString(streak + "\n")
 	right.WriteString(fmt.Sprintf("Решено задач: %d\n", len(a.solved)))
 	if t := a.taskOfDay(); t != nil {
-		right.WriteString("\n" + a.st.Dim.Render("Задача дня: ") + t.Title + " " + a.st.diff(t.Difficulty) + "\n")
+		right.WriteString("\n" + a.st.Dim.Render("Задача дня: ") + t.Title + " " + a.st.Diff(t.Difficulty) + "\n")
 	}
 
 	l := left.String()
@@ -146,37 +140,4 @@ func (a *App) viewHome() string {
 		return lipgloss.JoinHorizontal(lipgloss.Top, l, "   ", r)
 	}
 	return l + "\n" + r
-}
-
-func bar(n, total, width int) string {
-	if total <= 0 {
-		return strings.Repeat("░", width)
-	}
-	filled := n * width / total
-	return strings.Repeat("█", filled) + strings.Repeat("░", width-filled)
-}
-
-// wrap breaks text at spaces so lines fit width runes.
-func wrap(s string, width int) string {
-	var out []string
-	for _, para := range strings.Split(s, "\n") {
-		words := strings.Fields(para)
-		if len(words) == 0 {
-			out = append(out, "")
-			continue
-		}
-		line := ""
-		for _, w := range words {
-			if line == "" {
-				line = w
-			} else if len([]rune(line))+1+len([]rune(w)) <= width {
-				line += " " + w
-			} else {
-				out = append(out, line)
-				line = w
-			}
-		}
-		out = append(out, line)
-	}
-	return strings.Join(out, "\n")
 }

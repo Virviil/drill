@@ -1,4 +1,4 @@
-package ui
+package drill
 
 import (
 	"fmt"
@@ -118,5 +118,3 @@ func (a *App) viewPlan() string {
 	}
 	return b.String()
 }
-
-func clipANSI(s string, w int) string { return truncateANSI(s, w) }

@@ -1,16 +1,21 @@
-package ui
+// Package tui holds styles and helpers shared by the hub and its doors.
+package tui
 
 import "github.com/charmbracelet/lipgloss"
 
-type styles struct {
+// Styles is the shared palette.
+type Styles struct {
 	Logo, Title, Accent, Dim, Rule, Error, OK, Warn, Selected, Box, Key lipgloss.Style
-	Easy, Medium, Hard                                                 lipgloss.Style
+	Easy, Medium, Hard                                                  lipgloss.Style
 }
 
-func newStyles(r *lipgloss.Renderer) styles {
-	ad := func(light, dark string) lipgloss.AdaptiveColor { return lipgloss.AdaptiveColor{Light: light, Dark: dark} }
+// NewStyles builds the palette for a session renderer.
+func NewStyles(r *lipgloss.Renderer) Styles {
+	ad := func(light, dark string) lipgloss.AdaptiveColor {
+		return lipgloss.AdaptiveColor{Light: light, Dark: dark}
+	}
 	ns := r.NewStyle
-	return styles{
+	return Styles{
 		Logo:     ns().Bold(true).Background(ad("#1e66f5", "#61afef")).Foreground(ad("#ffffff", "#000000")),
 		Title:    ns().Bold(true).Foreground(ad("#1e66f5", "#61afef")),
 		Accent:   ns().Bold(true).Foreground(ad("#fe640b", "#e5c07b")),
@@ -28,7 +33,8 @@ func newStyles(r *lipgloss.Renderer) styles {
 	}
 }
 
-func (s styles) diff(d string) string {
+// Diff renders a difficulty label.
+func (s Styles) Diff(d string) string {
 	switch d {
 	case "easy":
 		return s.Easy.Render("Easy  ")
@@ -40,7 +46,8 @@ func (s styles) diff(d string) string {
 	return d
 }
 
-const banner = `
+// Banner is the ASCII logo.
+const Banner = `
  ██████╗ ██████╗ ██╗██╗     ██╗
  ██╔══██╗██╔══██╗██║██║     ██║
  ██║  ██║██████╔╝██║██║     ██║
