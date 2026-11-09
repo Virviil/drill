@@ -1,4 +1,4 @@
-package ui
+package drill
 
 import (
 	"errors"
@@ -8,12 +8,10 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/charmbracelet/x/ansi"
 
 	"github.com/Virviil/drill/internal/catalog"
 	"github.com/Virviil/drill/internal/editor"
 	"github.com/Virviil/drill/internal/judge"
-	"github.com/Virviil/drill/internal/store"
 )
 
 type taskModel struct {
@@ -52,7 +50,7 @@ func (a *App) openTask(t *catalog.Task) tea.Cmd {
 		lang = t.LangList()[0]
 	}
 	code, err := a.deps.Store.Draft(a.ctx, a.user.ID, t.Slug, string(lang))
-	if errors.Is(err, store.ErrNotFound) {
+	if errors.Is(err, ErrNotFound) {
 		code, err = t.Langs[lang].Stub, nil
 	}
 	if err != nil {
@@ -214,7 +212,7 @@ func (a *App) onResult(msg resultMsg) tea.Cmd {
 			a.fail(err)
 		}
 	}
-	a.deps.Log.Info("check", "user", a.nick(), "sub", msg.subID, "status", res.Status, "passed", res.Passed, "total", res.Total)
+	a.sess.Log.Info("check", "user", a.nick(), "sub", msg.subID, "status", res.Status, "passed", res.Passed, "total", res.Total)
 	t := a.task
 	if t == nil { // left the screen meanwhile
 		a.refresh()
@@ -250,7 +248,7 @@ func (a *App) viewTask() string {
 	ew, eh := t.editorSize(a)
 	t.ed.SetSize(ew, eh)
 
-	top := a.st.Logo.Render(" DRILL ") + " " + a.st.Title.Render(t.task.Title) + " " + a.st.diff(t.task.Difficulty) + " " + a.st.Dim.Render(string(t.lang))
+	top := a.st.Logo.Render(" DRILL ") + " " + a.st.Title.Render(t.task.Title) + " " + a.st.Diff(t.task.Difficulty) + " " + a.st.Dim.Render(string(t.lang))
 	if len(a.solved[t.task.Slug]) > 0 {
 		top += " " + a.st.OK.Render("✓")
 	}
@@ -393,28 +391,6 @@ func orNull(s string) string {
 		return "null"
 	}
 	return s
-}
-
-func truncateANSI(s string, w int) string { return ansi.Truncate(s, w, "") }
-
-// padBlock makes s exactly w×h cells.
-func padBlock(s string, w, h int) string {
-	lines := strings.Split(s, "\n")
-	if len(lines) > h {
-		lines = lines[:h]
-	}
-	for len(lines) < h {
-		lines = append(lines, "")
-	}
-	for i, l := range lines {
-		lw := lipgloss.Width(l)
-		if lw < w {
-			lines[i] = l + strings.Repeat(" ", w-lw)
-		} else if lw > w {
-			lines[i] = truncateANSI(l, w)
-		}
-	}
-	return strings.Join(lines, "\n")
 }
 
 func wrapHard(s string, w int) string {
